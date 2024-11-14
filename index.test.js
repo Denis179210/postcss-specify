@@ -10,10 +10,10 @@ async function run(input, output, opts = {}) {
   equal(result.warnings().length, 0)
 }
 
-/* Write tests here
-
+const input = '.hello,.hello-again { color: red; .inside { height: 100% } } .world { color: gray } @media screen { .yes { color: blue } }';
+const expect = `#app {${input} }`;
+// const wrapped = `${}`
 test('does something', async () => {
-  await run('a{ }', 'a{ }', { })
+  await run(input, expect, { 'selector': '#app' })
 })
 
-*/

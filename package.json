@@ -1,0 +1,33 @@
+{
+  "name": "postcss-specify",
+  "version": "0.0.0",
+  "description": "PostCSS plugin postcss-specify",
+  "keywords": ["postcss", "css", "postcss-plugin", "postcss-specify"],
+  "scripts": {
+    "unit": "node --test index.test.js",
+    "test": "npm run unit && eslint ."
+  },
+  "author": "Denis Bochar <denis.bochar1992@gmail.com>",
+  "license": "MIT",
+  "repository": "Denis179210/postcss-specify",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "peerDependencies": {
+    "postcss": "^8.4.27"
+  },
+  "devDependencies": {
+    "eslint": "^8.47.0",
+    "postcss": "^8.4.27"
+  },
+  "eslintConfig": {
+    "parserOptions": {
+      "ecmaVersion": 2017
+    },
+    "env": {
+      "node": true,
+      "es6": true
+    },
+    "extends": ["eslint:recommended"]
+  }
+}

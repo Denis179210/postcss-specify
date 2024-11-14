@@ -1,3 +1,7 @@
+function isMulti(selector) {
+  return selector.split(',').length > 1;
+}
+
 /**
  * @type {import('postcss').PluginCreator}
  */
@@ -21,20 +25,39 @@ module.exports = (opts = {}) => {
       const ignoreNodes = [];
       const acceptNodes = [];
 
-      root.nodes.forEach((node) => {
-        const clone = node.clone();
+      root.nodes.forEach((item) => {
+        const clone = item.clone();
         if (
             Array.isArray(ignoreTransformationFor) &&
-            !!ignoreTransformationFor.length &&
-            node instanceof Rule &&
-            ignoreTransformationFor.includes(clone.selector)
+            ignoreTransformationFor.length &&
+            item instanceof Rule
         ) {
-          ignoreNodes.push(clone);
+          if(isMulti(clone.selector)) {
+            const multiSelector = clone.selector.split(',');
+            const acceptable = [];
+            multiSelector.forEach((entryName) => {
+              if (ignoreTransformationFor.includes(entryName)) {
+                const ignorableClone = clone.clone();
+                ignorableClone.selector = entryName;
+                ignoreNodes.push(ignorableClone);
+              } else {
+                acceptable.push(entryName);
+              }
+            });
+            if (acceptable.length) {
+              clone.selector = acceptable.join(',');
+              acceptNodes.push(clone);
+            }
+          }
+          else if (ignoreTransformationFor.includes(clone.selector)) {
+            ignoreNodes.push(clone);
+          } else {
+            acceptNodes.push(clone);
+          }
         }
         else {
           acceptNodes.push(clone);
         }
-
       });
 
       root.removeAll();

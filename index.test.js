@@ -16,13 +16,11 @@ test('Specifies all rules', async () => {
   await run(input, expect, { 'selector': '#app' })
 });
 
-
 test('Specifies all rules except ignore list', async () => {
   const input = 'html { font-size: 16px } .hello,.hello-again { color: red; .inside { height: 100% } } .world { color: gray } @media screen { .yes { color: blue } }';
-  const expect = `html { font-size: 16px } #app { .hello,.hello-again { color: red; .inside { height: 100% } } .world { color: gray } @media screen { .yes { color: blue } } }`;
+  const expect = `html { font-size: 16px } #app { .hello, .hello-again { color: red; .inside { height: 100% } } .world { color: gray } @media screen { .yes { color: blue } } }`;
   await run(input, expect, { 'selector': '#app', 'ignore': ['html', 'body', ':before'] })
 });
-
 
 test('Does nothing because of selector argument absence', async () => {
   const input = '.hello,.hello-again { color: red; .inside { height: 100% } } .world { color: gray } @media screen { .yes { color: blue } }';
@@ -31,11 +29,10 @@ test('Does nothing because of selector argument absence', async () => {
 });
 
 test('Specifies all rules except ignore list and extracts ignorable selector names from multi-selectors', async () => {
-  const input = 'html,body,div { font-size: 16px } .hello,.hello-again { color: red; .inside { height: 100% } } .world { color: gray } @media screen { .yes { color: blue } }';
-  const expect = `html { font-size: 16px }body { font-size: 16px }#app {div { font-size: 16px } .hello,.hello-again { color: red; .inside { height: 100% } } .world { color: gray } @media screen { .yes { color: blue } } }`;
-  await run(input, expect, { 'selector': '#app', 'ignore': ['html', 'body', ':before'] })
+  const input = 'html,:host,body,div { font-size: 16px } .hello,.hello-again { color: red; .inside { height: 100% } } .world { color: gray } @media screen { .yes { color: blue } }';
+  const expect = `html, :host, body { font-size: 16px }#app {div { font-size: 16px } .hello, .hello-again { color: red; .inside { height: 100% } } .world { color: gray } @media screen { .yes { color: blue } } }`;
+  await run(input, expect, { 'selector': '#app', 'ignore': ['html', 'body', '::before', ':host'] })
 });
-
 
 test('Keeps original indents and spaces', async () => {
   const input = `
@@ -47,7 +44,7 @@ test('Keeps original indents and spaces', async () => {
     }
   `;
   const expect = `#app {
-    .hello,.hello-again {
+    .hello, .hello-again {
       color: red;
       .inside {
         height: 100%
@@ -55,12 +52,12 @@ test('Keeps original indents and spaces', async () => {
     }
 }
   `;
-  await run(input, expect, { 'selector': '#app', 'ignore': ['html', 'body', ':before'] })
+  await run(input, expect, { 'selector': '#app', 'ignore': ['html', 'body', '::before'] })
 });
 
 test('Ignores pseudo elements and pseudo classes', async () => {
-  const input = `::after {content: '*'; display: block} div {color: red}`;
-  const expect = `::after {content: '*'; display: block} #app { div {color: red}}`;
+  const input = `::after {content: '*'; display: block} div {color: red} ::before, ::after {--tw-content: '';}`;
+  const expect = `::after {content: '*'; display: block} ::before, ::after {--tw-content: '';} #app { div {color: red}}`;
   await run(input, expect, { 'selector': '#app', 'ignore': ['html', 'body', ':host', '::before', '::after'] })
 });
 

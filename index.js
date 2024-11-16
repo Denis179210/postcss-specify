@@ -34,18 +34,24 @@ module.exports = (opts = {}) => {
         ) {
           if(isMulti(clone.selector)) {
             const multiSelector = clone.selector.split(',');
+            const ignorable = [];
             const acceptable = [];
             multiSelector.forEach((entryName) => {
+              entryName = entryName.trim();
+
               if (ignoreTransformationFor.includes(entryName)) {
-                const ignorableClone = clone.clone();
-                ignorableClone.selector = entryName;
-                ignoreNodes.push(ignorableClone);
+                ignorable.push(entryName);
               } else {
                 acceptable.push(entryName);
               }
             });
+            if (ignorable.length) {
+              const ignorableClone = clone.clone();
+              ignorableClone.selector = ignorable.join(', ');
+              ignoreNodes.push(ignorableClone);
+            }
             if (acceptable.length) {
-              clone.selector = acceptable.join(',');
+              clone.selector = acceptable.join(', ');
               acceptNodes.push(clone);
             }
           }
